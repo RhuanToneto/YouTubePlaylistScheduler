@@ -1,13 +1,28 @@
+"""Utilitários de interação no terminal (entrada e saída).
+
+Responsável por exibir contagens, listar o agendamento proposto e
+solicitar confirmação do usuário de forma simples e direta.
+"""
+
 from .timezone import format_brasilia_date, format_brasilia_time
 
 
 def print_video_counts(total_found, total_private):
+    """Mostra quantos vídeos foram encontrados e quantos estão privados."""
     print("\n[VÍDEOS]")
     print(f"Total: {total_found}")
     print(f"Privados: {total_private}")
 
 
 def confirm_schedule(schedule):
+    """Exibe o agendamento proposto e pede confirmação ao usuário.
+
+    Parâmetros:
+        schedule (list[dict]): itens com id, título e publishAt (ISO UTC).
+
+    Retorna:
+        bool: True para confirmar, False para cancelar.
+    """
     print("\n[AGENDAMENTO PROPOSTO]")
     for i, item in enumerate(schedule, 1):
         date_part = format_brasilia_date(item.get("publishAt"))
@@ -21,6 +36,7 @@ def confirm_schedule(schedule):
     options_no = {"N", "NAO", "NÃO"}
     opts_display = "[S] para Sim ou [N] para Não"
     while True:
+        # Normaliza a entrada e aceita variações simples de SIM/NÃO
         resp = input(f"Confirmar agendamento? {opts_display}: ").strip().upper()
         if not resp:
             print("Resposta vazia. Digite S ou N.\n")
@@ -33,6 +49,10 @@ def confirm_schedule(schedule):
 
 
 def print_summary(schedule):
+    """Mostra um resumo final do agendamento aplicado.
+
+    Destaca quantidade total, período coberto e horário de publicação.
+    """
     print("\n[RESUMO]")
     total = len(schedule)
     first_date = format_brasilia_date(schedule[0].get("publishAt"))
