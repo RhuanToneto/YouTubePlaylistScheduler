@@ -1,8 +1,11 @@
 """Utilitários de interação no terminal (entrada e saída).
 
-Responsável por exibir contagens, listar o agendamento proposto e
-solicitar confirmação do usuário de forma simples e direta.
+Responsável por exibir contagens, listar o agendamento proposto,
+mostrar um resumo de dias ocupados (quando houver) e solicitar
+confirmação do usuário de forma simples e direta.
 """
+
+from datetime import timedelta
 
 from .timezone import format_brasilia_date, format_brasilia_time
 
@@ -12,6 +15,34 @@ def print_video_counts(total_found, total_private):
     print("\n[VÍDEOS]")
     print(f"Total: {total_found}")
     print(f"Privados: {total_private}")
+
+
+def print_occupied_overview(occupied_dates, start_date):
+    """Exibe um resumo dos dias ocupados e o próximo dia livre.
+
+    Mostra o total de dias futuros já ocupados por agendamentos do canal,
+    lista as datas ocupadas de forma ordenada e informa o próximo dia
+    livre a partir de ``start_date``. Não imprime nada caso não existam
+    dias ocupados.
+
+    Parâmetros:
+        occupied_dates (set[datetime.date]): conjunto de datas ocupadas (Brasília).
+        start_date (datetime.date): data inicial de referência para localizar o próximo dia livre.
+
+    Retorna:
+        None
+    """
+    if not occupied_dates:
+        return
+    next_free = start_date
+    while next_free in occupied_dates:
+        next_free = next_free + timedelta(days=1)
+    print("\n[DIAS OCUPADOS DETECTADOS]")
+    print(f"Total: {len(occupied_dates)}")
+    ordered = sorted(occupied_dates)
+    formatted = ", ".join(d.strftime('%d/%m/%Y') for d in ordered)
+    print(f"Dias ocupados: {formatted}")
+    print(f"Próximo dia livre: {next_free.strftime('%d/%m/%Y')}")
 
 
 def confirm_schedule(schedule):
