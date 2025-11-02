@@ -2,6 +2,8 @@
 
 Este projeto é uma aplicação em Python (CLI) para automatizar o agendamento de vídeos privados de uma playlist do YouTube. O fluxo principal autentica via OAuth 2.0, lê os vídeos de uma playlist, filtra apenas os vídeos com status de privacidade "Privado" e propõe um cronograma de publicação a partir do dia seguinte: um vídeo por dia, às 18:00 (horário de Brasília), caso deseje outro horário, altere `DEFAULT_HOUR` e `DEFAULT_MINUTE` em `src/scheduler.py`. 
 
+Antes de propor o cronograma, o sistema verifica os dias já ocupados por vídeos do canal com publicação agendada, inspecionando os 1000 uploads mais recentes. Dias ocupados são pulados automaticamente e os novos vídeos são colocados nos próximos dias livres, evitando colisões de dois vídeos no mesmo dia.
+
 A ordem de agendamento segue exatamente a ordenação atual da playlist no YouTube (do primeiro ao último). Após sua confirmação no terminal, os vídeos têm a data de publicação agendada por meio da YouTube Data API v3. Todo o processo é feito pela linha de comando, guiando você da autenticação à confirmação do agendamento.
 
 ## Requisitos
