@@ -1,20 +1,5 @@
-"""Funções para ler vídeos de uma playlist e filtrar privados.
-
-As consultas respeitam os limites da API:
-- playlistItems.list paginado (até 50 por página);
-- videos.list em lotes de até 50 IDs por chamada.
-"""
-
 def get_playlist_videos(youtube, playlist_id):
-    """Retorna todos os vídeos (id e título) de uma playlist.
-
-    Parâmetros:
-        youtube: cliente autenticado da YouTube Data API.
-        playlist_id (str): ID da playlist alvo.
-
-    Retorna:
-        list[dict]: cada item com chaves "id" e "title".
-    """
+    # Lê vídeos da playlist em páginas de 50 até esgotar os itens.
     videos = []
     next_page_token = None
     while True:
@@ -36,20 +21,11 @@ def get_playlist_videos(youtube, playlist_id):
 
 
 def filter_private_videos_batched(youtube, videos):
-    """Filtra apenas os vídeos com status "private" em lotes de até 50.
-
-    Parâmetros:
-        youtube: cliente autenticado da YouTube Data API.
-        videos (list[dict]): itens com pelo menos a chave "id".
-
-    Retorna:
-        list[dict]: subset dos vídeos de entrada com privacyStatus=="private".
-    """
+    # Filtra vídeos privados consultando em blocos de 50 IDs.
     private_videos = []
     ids = [v["id"] for v in videos]
     for i in range(0, len(ids), 50):
         chunk = ids[i:i+50]
-        # Consulta status em lotes (máx. 50 IDs por chamada)
         req = youtube.videos().list(part="status", id=",".join(chunk))
         resp = req.execute()
         privacy_by_id = {item["id"]: item["status"].get("privacyStatus") for item in resp.get("items", [])}
