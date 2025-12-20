@@ -26,12 +26,18 @@ def filter_private_videos_batched(youtube, videos):
     ids = [v["id"] for v in videos]
     for i in range(0, len(ids), 50):
         chunk = ids[i:i+50]
-        req = youtube.videos().list(part="status", id=",".join(chunk))
+        req = youtube.videos().list(part="snippet,status", id=",".join(chunk))
         resp = req.execute()
-        privacy_by_id = {item["id"]: item["status"].get("privacyStatus") for item in resp.get("items", [])}
+        details_by_id = {item["id"]: item for item in resp.get("items", [])}
         for v in videos[i:i+50]:
-            status = privacy_by_id.get(v["id"])
+            detail = details_by_id.get(v["id"])
+            if not detail:
+                continue
+            status = detail.get("status", {}).get("privacyStatus")
             if status == "private":
+                title = detail.get("snippet", {}).get("title")
+                if title:
+                    v["title"] = title
                 v["privacyStatus"] = status
                 private_videos.append(v)
     return private_videos
